@@ -131,7 +131,8 @@ class PugRenderer
      * @param string $key
      * @param mixed  $value
      */
-    public function addAttribute($key, $value) {
+    public function addAttribute($key, $value)
+    {
         $this->adapter->share($key, $value);
     }
 
@@ -142,7 +143,8 @@ class PugRenderer
      *
      * @return mixed
      */
-    public function getAttribute($key) {
+    public function getAttribute($key)
+    {
         $attributes = $this->getAttributes();
 
         return isset($attributes[$key]) ? $attributes[$key] : null;
@@ -188,7 +190,7 @@ class PugRenderer
      * @param array             $data
      *
      * @throws \InvalidArgumentException if it contains template as a key
-     * @throws \RuntimeException if `$templatePath . $template` does not exist
+     * @throws \RuntimeException         if `$templatePath . $template` does not exist
      *
      * @return ResponseInterface
      */
@@ -207,7 +209,7 @@ class PugRenderer
      * @param array  $data
      *
      * @throws \InvalidArgumentException if it contains template as a key
-     * @throws \RuntimeException if `$templatePath . $template` does not exist
+     * @throws \RuntimeException         if `$templatePath . $template` does not exist
      *
      * @return mixed
      */

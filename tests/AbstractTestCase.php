@@ -2,8 +2,8 @@
 
 namespace Slim\Pug\Tests;
 
-use Slim\Pug\PugRenderer;
 use Slim\App;
+use Slim\Pug\PugRenderer;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -19,12 +19,12 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $options = array(
+        $options = [
             'version'        => '0.0.0',
             'debug'          => false,
             'mode'           => 'testing',
-            'templates.path' => __DIR__ . '/templates'
-        );
+            'templates.path' => __DIR__ . '/templates',
+        ];
         if (class_exists('\\Tale\\Pug\\Renderer')) {
             $options['renderer'] = '\\Tale\\Pug\\Renderer';
         }

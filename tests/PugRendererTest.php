@@ -2,13 +2,13 @@
 
 namespace Slim\Pug\Tests;
 
-use Slim\Pug\PugRenderer;
 use Slim\Http\Body;
 use Slim\Http\Headers;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Stream;
 use Slim\Http\Uri;
+use Slim\Pug\PugRenderer;
 
 class PugRendererTest extends AbstractTestCase
 {
@@ -34,9 +34,9 @@ class PugRendererTest extends AbstractTestCase
         $route->run($request, $response);
 
         self::assertSame(
-            '<!DOCTYPE html><html>'.
-            '<head><title>Home page</title></head>'.
-            '<body><header><h1>Home page</h1></header><section>Hello bob</section><footer>Bye</footer></body>'.
+            '<!DOCTYPE html><html>' .
+            '<head><title>Home page</title></head>' .
+            '<body><header><h1>Home page</h1></header><section>Hello bob</section><footer>Bye</footer></body>' .
             '</html>',
             str_replace(["\r", "\n"], '', file_get_contents($tempOut))
         );
