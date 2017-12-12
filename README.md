@@ -1,6 +1,5 @@
 # Pug for Slim
 
-[![License](https://poser.pugx.org/pug/slim/license.svg)](https://packagist.org/packages/pug/slim)
 [![Latest Stable Version](https://poser.pugx.org/pug/slim/v/stable.png)](https://packagist.org/packages/pug/slim)
 [![Build Status](https://travis-ci.org/pug-php/pug-slim.svg?branch=master)](https://travis-ci.org/pug-php/pug-slim)
 [![Code Climate](https://codeclimate.com/github/pug-php/pug-slim/badges/gpa.svg)](https://codeclimate.com/github/pug-php/pug-slim)
