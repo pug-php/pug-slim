@@ -18,11 +18,13 @@ class PugRenderer
      */
     private $adapter;
 
-    public function __construct($templatePath = '', $options = [], $attributes = [])
+    public function __construct($templatePath = null, $options = [], $attributes = [])
     {
         $className = isset($options['renderer']) ? $options['renderer'] : Pug::class;
         $this->adapter = new $className($options);
-        $this->setTemplatePath($templatePath);
+        if ($templatePath) {
+            $this->setTemplatePath($templatePath);
+        }
         $this->adapter->share($attributes);
     }
 
@@ -42,7 +44,8 @@ class PugRenderer
             $app = new App();
         }
         $container = $app->getContainer();
-        $container['renderer'] = new static($templatePath ?: $container['templates.path'], $options, $attributes);
+        $templatePath = $templatePath ?: (isset($container['templates.path']) ? $container['templates.path'] : null);
+        $container['renderer'] = new static($templatePath, $options, $attributes);
 
         return $app;
     }

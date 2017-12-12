@@ -42,6 +42,11 @@ class PugRendererTest extends AbstractTestCase
         );
     }
 
+    public function testCreate()
+    {
+        self::assertInstanceOf(PugRenderer::class, PugRenderer::create()->getContainer()->renderer);
+    }
+
     public function testGetTemplatePath()
     {
         $path = rtrim($this->pug->getTemplatePath(), DIRECTORY_SEPARATOR);
