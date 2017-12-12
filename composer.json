@@ -1,16 +1,31 @@
 {
-    "name": "md/pug-slim",
+    "name": "pug/slim",
+    "description": "Pug template engine adapter for Slim",
+    "type": "library",
+    "keywords": ["phug", "jade", "pug", "html", "php", "slim"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marcello Duarte",
+            "homepage": "https://github.com/MarcelloDuarte"
+        },
+        {
+            "name": "Kyle Katarn",
+            "homepage": "https://www.phug-lang.com"
+        }
+    ],
     "require": {
-        "pug-php/pug": "^2.6",
+        "pug-php/pug": "^2.6 || ^3.0",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
         "slim/slim": "^3.0",
-        "phpunit/phpunit": ">4 <6"
+        "phpunit/phpunit": "^4.8.35 || ^5.7",
+        "codeclimate/php-test-reporter": "^0.4.0"
     },
     "autoload": {
         "psr-4": {
-            "Md\\Pug\\": "src"
+            "Slim\\Pug\\": "src"
         }
     }
 }

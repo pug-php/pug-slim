@@ -1,11 +1,8 @@
 <?php
 
-namespace Md\Pug\Tests;
+namespace Slim\Pug\Tests;
 
-use InvalidArgumentException;
-use Md\Pug\PugRenderer;
-use Pug\Pug;
-use RuntimeException;
+use Slim\Pug\PugRenderer;
 use Slim\Http\Body;
 use Slim\Http\Headers;
 use Slim\Http\Request;
@@ -17,8 +14,9 @@ class PugRendererTest extends AbstractTestCase
 {
     public function testPugRenderer()
     {
-        $tempIn = sys_get_temp_dir() . '/streamIn.txt';
-        $tempOut = sys_get_temp_dir() . '/streamIn.txt';
+        $rand = mt_rand(0, 99999999);
+        $tempIn = sys_get_temp_dir() . '/streamIn-' . $rand . '.txt';
+        $tempOut = sys_get_temp_dir() . '/streamOut-' . $rand . '.txt';
         touch($tempIn);
         touch($tempOut);
         $headers = new Headers();
@@ -40,17 +38,8 @@ class PugRendererTest extends AbstractTestCase
             '<head><title>Home page</title></head>'.
             '<body><header><h1>Home page</h1></header><section>Hello bob</section><footer>Bye</footer></body>'.
             '</html>',
-            file_get_contents($tempOut)
+            str_replace(["\r", "\n"], '', file_get_contents($tempOut))
         );
-    }
-
-    /**
-     * @expectedException        RuntimeException
-     * @expectedExceptionMessage View cannot render `foo.pug` because the template does not exist
-     */
-    public function testTemplateNotFound()
-    {
-        $this->pug->fetch('foo.pug');
     }
 
     public function testGetTemplatePath()
@@ -58,17 +47,6 @@ class PugRendererTest extends AbstractTestCase
         $path = rtrim($this->pug->getTemplatePath(), DIRECTORY_SEPARATOR);
 
         self::assertSame($path, $this->app->getContainer()['templates.path']);
-    }
-
-    /**
-     * @expectedException        InvalidArgumentException
-     * @expectedExceptionMessage Duplicate template key found
-     */
-    public function testForbiddenKey()
-    {
-        $this->pug->fetch('foo.pug', [
-            'template' => 'bar.pug',
-        ]);
     }
 
     public function testAttributes()
@@ -84,18 +62,17 @@ class PugRendererTest extends AbstractTestCase
         ], $this->pug->getAttributes());
         self::assertSame('bar', $this->pug->getAttribute('foo'));
         self::assertSame(42, $this->pug->getAttribute('biz'));
-        self::assertSame(false, $this->pug->getAttribute('bar'));
+        self::assertSame(null, $this->pug->getAttribute('bar'));
     }
 
-    public function testAdaptee()
+    public function testAdapter()
     {
         $renderer = new PugRenderer(__DIR__, [
             'cache'         => 'foo',
             'upToDateCheck' => false,
         ]);
 
-        self::assertInstanceOf(Pug::class, $renderer->adaptee);
-        self::assertSame('foo', $renderer->adaptee->getOption('cache'));
-        self::assertFalse($renderer->adaptee->getOption('upToDateCheck'));
+        self::assertSame('foo', $renderer->getOption('cache'));
+        self::assertFalse($renderer->getOption('upToDateCheck'));
     }
 }

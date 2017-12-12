@@ -1,104 +1,196 @@
 <?php
 
-namespace Md\Pug;
+namespace Slim\Pug;
 
 use Psr\Http\Message\ResponseInterface;
 use Pug\Pug;
+use Slim\App;
 
 /**
- * Class PugRenderer
- * @package Md\Pug
+ * Class PugRenderer.
  *
- * Render Pug view scripts into a PSR-7 Response object
+ * Render Pug view scripts into a PSR-7 Response object.
  */
 class PugRenderer
 {
-    private $templatePath;
+    /**
+     * @var Pug
+     */
+    private $adapter;
 
-    public function __construct($templatePath = '', $attributes = [])
+    public function __construct($templatePath = '', $options = [], $attributes = [])
     {
-        $this->adaptee = new Pug($this->validateDefaultAttributes($templatePath, $attributes));
+        $className = isset($options['renderer']) ? $options['renderer'] : Pug::class;
+        $this->adapter = new $className($options);
         $this->setTemplatePath($templatePath);
-        $this->attributes = $attributes;
+        $this->adapter->share($attributes);
     }
 
     /**
-     * Get the attributes for the renderer
+     * Create a pug renderer and append it to the slim app given in parameter.
+     *
+     * @param App    $app
+     * @param string $templatePath
+     * @param array  $options
+     * @param array  $attributes
+     *
+     * @return App
+     */
+    public static function create(App $app = null, $templatePath = null, array $options = [], array $attributes = [])
+    {
+        if (!$app) {
+            $app = new App();
+        }
+        $container = $app->getContainer();
+        $container['renderer'] = new static($templatePath ?: $container['templates.path'], $options, $attributes);
+
+        return $app;
+    }
+
+    /**
+     * Return the adapter option or the given default value, or null if no default given.
+     *
+     * @param string $name
+     * @param null   $default
+     *
+     * @return mixed
+     */
+    public function getOption($name, $default = null)
+    {
+        // @codeCoverageIgnoreStart
+        try {
+            return method_exists($this->adapter, 'hasOption') && !$this->adapter->hasOption($name)
+                ? $default
+                : $this->adapter->getOption($name);
+        } catch (\InvalidArgumentException $exception) {
+            return $default;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Set an option of the adapter.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setOption($name, $value)
+    {
+        $method = method_exists($this->adapter, 'setCustomOption')
+            ? [$this->adapter, 'setCustomOption']
+            : [$this->adapter, 'setOption'];
+        call_user_func($method, $name, $value);
+
+        return $this;
+    }
+
+    /**
+     * Set options of the adapter.
+     *
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function setOptions(array $options)
+    {
+        foreach ($options as $name => $value) {
+            $this->setOption($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the attributes for the renderer.
      *
      * @return array
      */
     public function getAttributes()
     {
-        return $this->attributes;
+        return array_merge(
+            $this->getOption('globals') ?: [],
+            $this->getOption('shared_variables') ?: []
+        );
     }
 
     /**
-     * Set the attributes for the renderer
+     * Set the attributes for the renderer.
      *
      * @param array $attributes
      */
     public function setAttributes(array $attributes)
     {
-        $this->attributes = $attributes;
+        $this->adapter->share($attributes);
     }
 
     /**
-     * Add an attribute
+     * Add an attribute.
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed  $value
      */
     public function addAttribute($key, $value) {
-        $this->attributes[$key] = $value;
+        $this->adapter->share($key, $value);
     }
 
     /**
-     * Retrieve an attribute
+     * Retrieve an attribute.
      *
-     * @param $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function getAttribute($key) {
-        if (!isset($this->attributes[$key])) {
-            return false;
-        }
+        $attributes = $this->getAttributes();
 
-        return $this->attributes[$key];
+        return isset($attributes[$key]) ? $attributes[$key] : null;
     }
 
     /**
-     * Get the template path
+     * Get the template path.
      *
      * @return string
      */
     public function getTemplatePath()
     {
-        return $this->templatePath;
+        return $this->getOption('base_dir');
     }
 
     /**
-     * Set the template path
+     * Set the template path.
      *
      * @param string $templatePath
+     *
+     * @return $this
      */
     public function setTemplatePath($templatePath)
     {
-        $this->templatePath = rtrim($templatePath, '/\\') . DIRECTORY_SEPARATOR;
+        $templatePath = rtrim($templatePath, '/\\');
+        $this->setOptions([
+            'path'     => $templatePath,
+            'paths'    => [$templatePath],
+            'basedir'  => $templatePath,
+            'base_dir' => $templatePath,
+        ]);
+
+        return $this;
     }
 
     /**
-     * Renders a template
+     * Renders a template.
      *
-     * Fetches the template and wraps it in a response object
+     * Fetches the template and wraps it in a response object.
      *
      * @param ResponseInterface $response
-     * @param string             $template
-     * @param array              $data
-     *
-     * @return ResponseInterface
+     * @param string            $template
+     * @param array             $data
      *
      * @throws \InvalidArgumentException if it contains template as a key
      * @throws \RuntimeException if `$templatePath . $template` does not exist
+     *
+     * @return ResponseInterface
      */
     public function render(ResponseInterface $response, $template, array $data = [])
     {
@@ -109,49 +201,27 @@ class PugRenderer
     }
 
     /**
-     * Fetches a template and returns the result as a string
+     * Fetches a template and returns the result as a string.
      *
-     * @param $template
-     * @param array $data
-     *
-     * @return mixed
+     * @param string $template
+     * @param array  $data
      *
      * @throws \InvalidArgumentException if it contains template as a key
      * @throws \RuntimeException if `$templatePath . $template` does not exist
+     *
+     * @return mixed
      */
     public function fetch($template, array $data = [])
     {
-        if (isset($data['template'])) {
-            throw new \InvalidArgumentException('Duplicate template key found');
+        $method = method_exists($this->adapter, 'renderFile')
+            ? [$this->adapter, 'renderFile']
+            : [$this->adapter, 'render'];
+        // @codeCoverageIgnoreStart
+        if ($this->adapter instanceof \Tale\Pug\Renderer && !($this->adapter instanceof \Phug\Renderer)) {
+            $this->adapter->compile(''); // Init ->files
         }
+        // @codeCoverageIgnoreEnd
 
-        $path = $this->templatePath . ltrim($template, '/\\');
-
-        if (!is_file($path)) {
-            throw new \RuntimeException("View cannot render `$template` because the template does not exist");
-        }
-
-        $data = array_merge($this->attributes, $data);
-
-        return $this->adaptee->render($path, $data);
-    }
-
-    private function validateDefaultAttributes($templatePath, array $attributes)
-    {
-        $settings = [];
-
-        if (isset($attributes['cache'])) {
-            $settings['cache'] = $attributes['cache'];
-        }
-        
-        if (isset($attributes['upToDateCheck'])) {
-            $settings['upToDateCheck'] = $attributes['upToDateCheck'];
-        }
-        
-        $settings['extension'] = isset($attributes['extension']) ? $attributes['extension'] : '.pug';
-        $settings['basedir'] = $templatePath;
-        $settings['expressionLanguage'] = isset($attributes['expressionLanguage']) ? $attributes['expressionLanguage'] : 'php';
-
-        return $settings;
+        return call_user_func($method, $template, $data);
     }
 }

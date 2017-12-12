@@ -1,2 +1,5 @@
+.idea
+coverage
+coverage.xml
 vendor
 composer.lock
