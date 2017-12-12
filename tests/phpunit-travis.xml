@@ -1,5 +1,5 @@
 <phpunit
-        bootstrap="tests/bootstrap.php"
+        bootstrap="./bootstrap.php"
         backupGlobals="false"
         colors="true"
         convertErrorsToExceptions="true"
@@ -8,12 +8,12 @@
 >
     <testsuites>
         <testsuite name="Pug">
-            <directory suffix="Test.php">tests</directory>
+            <directory suffix="Test.php">.</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
+            <directory suffix=".php">../src</directory>
         </whitelist>
     </filter>
 </phpunit>

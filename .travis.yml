@@ -2,8 +2,6 @@ language: php
 
 matrix:
   include:
-    - php: 5.4
-      env: RENDERER='pug-php/pug:^2.7'
     - php: 5.5
       env: RENDERER='pug-php/pug:^2.7'
     - php: 5.5
