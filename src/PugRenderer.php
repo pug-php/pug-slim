@@ -20,6 +20,11 @@ class PugRenderer
 
     public function __construct($templatePath = null, $options = [], $attributes = [])
     {
+        if (is_array($templatePath)) {
+            $attributes = $options;
+            $options = $templatePath;
+            $templatePath = isset($options['templates.path']) ? $options['templates.path'] : null;
+        }
         $className = isset($options['renderer']) ? $options['renderer'] : Pug::class;
         $this->adapter = new $className($options);
         if ($templatePath) {
@@ -218,15 +223,29 @@ class PugRenderer
      */
     public function fetch($template, array $data = [])
     {
-        $method = method_exists($this->adapter, 'renderFile')
-            ? [$this->adapter, 'renderFile']
-            : [$this->adapter, 'render'];
+        if (!method_exists($this->adapter, 'renderFile')) {
+            $file = $this->getTemplatePath();
+            $file = $file ? $file : '';
+            $lastChar = substr($file, -1);
+            // @codeCoverageIgnoreStart
+            if ($lastChar !== '/' && $lastChar !== '\\') {
+                $firstChar = substr($template, 0, 1);
+                if ($firstChar !== '/' && $firstChar !== '\\') {
+                    $file .= '/';
+                }
+            }
+            // @codeCoverageIgnoreEnd
+            $file .= $template;
+
+            return $this->adapter->render(file_get_contents($file), $file, $data);
+        }
+
         // @codeCoverageIgnoreStart
         if ($this->adapter instanceof \Tale\Pug\Renderer && !($this->adapter instanceof \Phug\Renderer)) {
             $this->adapter->compile(''); // Init ->files
         }
         // @codeCoverageIgnoreEnd
 
-        return call_user_func($method, $template, $data);
+        return $this->adapter->renderFile($template, $data);
     }
 }
