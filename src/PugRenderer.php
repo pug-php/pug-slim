@@ -2,6 +2,7 @@
 
 namespace Slim\Pug;
 
+use ArrayAccess;
 use Psr\Http\Message\ResponseInterface;
 use Pug\Pug;
 use Slim\App;
@@ -25,11 +26,19 @@ class PugRenderer
             $options = $templatePath;
             $templatePath = isset($options['templates.path']) ? $options['templates.path'] : null;
         }
+
         $className = isset($options['renderer']) ? $options['renderer'] : Pug::class;
+
+        if ($options instanceof ArrayAccess) {
+            $options = (array) $options;
+        }
+
         $this->adapter = new $className($options);
+
         if ($templatePath) {
             $this->setTemplatePath($templatePath);
         }
+
         $this->adapter->share($attributes);
     }
 
