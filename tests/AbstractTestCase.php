@@ -2,10 +2,11 @@
 
 namespace Slim\Pug\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Slim\App;
 use Slim\Pug\PugRenderer;
 
-abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends TestCase
 {
     /**
      * @var App
