@@ -18,7 +18,25 @@ abstract class AbstractTestCase extends TestCase
      */
     protected $pug;
 
-    public function setUp()
+    protected function getApp()
+    {
+        if (!isset($this->app)) {
+            $this->init();
+        }
+
+        return $this->app;
+    }
+
+    protected function getPug()
+    {
+        if (!isset($this->pug)) {
+            $this->init();
+        }
+
+        return $this->pug;
+    }
+
+    protected function init()
     {
         $options = [
             'version'        => '0.0.0',
@@ -26,9 +44,11 @@ abstract class AbstractTestCase extends TestCase
             'mode'           => 'testing',
             'templates.path' => __DIR__ . '/templates',
         ];
+
         if (class_exists('\\Tale\\Pug\\Renderer')) {
             $options['renderer'] = '\\Tale\\Pug\\Renderer';
         }
+
         $app = PugRenderer::create(new App($options));
 
         $app->get('/hello/{name}', function ($request, $response, $args) {
