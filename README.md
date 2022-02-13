@@ -21,7 +21,7 @@ composer require pug/slim
 
 ```php
 use Slim\App;
-use Slim\Views\PugRenderer;
+use Slim\Pug\PugRenderer;
 
 include 'vendor/autoload.php';
 
@@ -39,7 +39,7 @@ PS: If you don't pass an application to the `create` method, we
 will automatically initialize one, so you can just do:
 
 ```php
-use Slim\Views\PugRenderer;
+use Slim\Pug\PugRenderer;
 
 include 'vendor/autoload.php';
 
