@@ -30,5 +30,10 @@
         "psr-4": {
             "Slim\\Pug\\": "src"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "nodejs-php-fallback/nodejs-php-fallback": true
+        }
     }
 }
