@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['5.5', '5.6', '7.0', '7.4', '8.0', '8.1', '8.4', '8.5']
+        php: ['7.1', '7.4', '8.0', '8.1', '8.4', '8.5']
         renderer: ['talesoft/tale-pug:^1.5', 'pug-php/pug:^2.7.6', 'pug-php/pug:^3.4.1']
         setup: ['lowest', 'stable']
 

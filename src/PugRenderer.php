@@ -52,11 +52,12 @@ class PugRenderer
      *
      * @return App
      */
-    public static function create(App $app = null, $templatePath = null, array $options = [], array $attributes = [])
+    public static function create(?App $app = null, $templatePath = null, array $options = [], array $attributes = [])
     {
         if (!$app) {
             $app = new App();
         }
+
         $container = $app->getContainer();
         $templatePath = $templatePath ?: (isset($container['templates.path']) ? $container['templates.path'] : null);
         $container['renderer'] = new static($templatePath, $options, $attributes);
