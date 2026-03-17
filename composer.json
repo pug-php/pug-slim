@@ -19,16 +19,22 @@
     },
     "require": {
         "pug-php/pug": "^2.7.6 || ^3.4.1",
-        "psr/http-message": "^1.0"
+        "psr/http-message": "^1.0 || ^2.0"
     },
     "require-dev": {
-        "slim/slim": "^3.0",
-        "phpunit/phpunit": "^4.8.35 || ^5.7 || ^8.5.15",
-        "codeclimate/php-test-reporter": "^0.4.0"
+        "slim/slim": "^3.12.5 || ^4.15.1",
+        "slim/psr7": "*",
+        "php-di/php-di": "^5.4.6 || ^6.4",
+        "phpunit/phpunit": "^4.8.35 || ^5.7 || ^8.5.15"
     },
     "autoload": {
         "psr-4": {
             "Slim\\Pug\\": "src"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "nodejs-php-fallback/nodejs-php-fallback": true
         }
     }
 }
