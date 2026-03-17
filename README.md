@@ -17,6 +17,29 @@ Install with [Composer](http://getcomposer.org):
 composer require pug/slim
 ```
 
+## Usage with Slim 4
+
+**routes.php**
+```php
+use Slim\Pug\PugRenderer;
+
+// ...
+
+$app->get('/', function (Request $request, Response $response) {
+    $renderer = new PugRenderer([
+        // The base folder containing the pug template files
+        // In this example we assume a home.pug file exist in it
+        'basedir' => __DIR__ . '/../templates',
+    ]);
+
+    $viewData = [
+        'name' => 'John',
+    ];
+
+    return $renderer->render($response, 'home.pug', $viewData);
+});
+````
+
 ## Usage with Slim 3
 
 ```php
@@ -46,13 +69,12 @@ include 'vendor/autoload.php';
 $app = PugRenderer::create(null, './templates');
 ```
 
-
 ## Usage with any PSR-7 Project
 
 ```php
 //Construct the View
 $pugView = new PugRenderer('./path/to/templates', [
-  'option' => 'foobar',
+  // Here you can set options
 ]);
 
 //Render a Template

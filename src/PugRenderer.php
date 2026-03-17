@@ -3,6 +3,7 @@
 namespace Slim\Pug;
 
 use ArrayAccess;
+use DI\Container;
 use Psr\Http\Message\ResponseInterface;
 use Pug\Pug;
 use Slim\App;
@@ -59,6 +60,14 @@ class PugRenderer
         }
 
         $container = $app->getContainer();
+
+        if ($container instanceof Container) {
+            $templatePath = $templatePath ?: ($container->has('templates.path') ? $container->get('templates.path') : null);
+            $container->set('renderer', new static($templatePath, $options, $attributes));
+
+            return $app;
+        }
+
         $templatePath = $templatePath ?: (isset($container['templates.path']) ? $container['templates.path'] : null);
         $container['renderer'] = new static($templatePath, $options, $attributes);
 
@@ -204,8 +213,8 @@ class PugRenderer
      * Fetches the template and wraps it in a response object.
      *
      * @param ResponseInterface $response
-     * @param string            $template
-     * @param array             $data
+     * @param string            $template path (from basedir if present) to the Pug template file
+     * @param array             $data     variables for the view
      *
      * @throws \InvalidArgumentException if it contains template as a key
      * @throws \RuntimeException         if `$templatePath . $template` does not exist
@@ -235,7 +244,7 @@ class PugRenderer
     {
         if (!method_exists($this->adapter, 'renderFile')) {
             $file = $this->getTemplatePath();
-            $file = $file ? $file : '';
+            $file = $file ?: '';
             $lastChar = substr($file, -1);
             // @codeCoverageIgnoreStart
             if ($lastChar !== '/' && $lastChar !== '\\') {

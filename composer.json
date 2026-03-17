@@ -23,6 +23,8 @@
     },
     "require-dev": {
         "slim/slim": "^3.12.5 || ^4.15.1",
+        "slim/psr7": "*",
+        "php-di/php-di": "^5.4.6 || ^6.4",
         "phpunit/phpunit": "^4.8.35 || ^5.7 || ^8.5.15"
     },
     "autoload": {
