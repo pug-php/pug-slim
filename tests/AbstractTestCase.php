@@ -122,7 +122,7 @@ abstract class AbstractTestCase extends TestCase
                 new Headers(),
                 [],
                 [],
-                new Stream(fopen($tempIn, 'r+')),
+                new Stream(fopen($tempIn, 'r+'))
             ));
 
             $body = $response->getBody();

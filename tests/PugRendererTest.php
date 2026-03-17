@@ -2,6 +2,9 @@
 
 namespace Slim\Pug\Tests;
 
+use ArrayAccess;
+use DI\Container;
+use Slim\App;
 use Slim\Pug\PugRenderer;
 
 class PugRendererTest extends AbstractTestCase
@@ -19,14 +22,24 @@ class PugRendererTest extends AbstractTestCase
 
     public function testCreate()
     {
-        self::assertInstanceOf(PugRenderer::class, PugRenderer::create()->getContainer()->renderer);
+        self::assertInstanceOf(App::class, PugRenderer::create());
     }
 
     public function testGetTemplatePath()
     {
         $path = rtrim($this->getPug()->getTemplatePath(), DIRECTORY_SEPARATOR);
+        $container = $this->getApp()->getContainer();
+        $v4 = (defined(App::class . '::VERSION') && ((int) App::VERSION) >= 4);
 
-        self::assertSame($path, $this->getApp()->getContainer()['templates.path']);
+        self::assertSame(__DIR__ . '/templates', $path);
+        self::assertInstanceOf(
+            $v4 ? Container::class : ArrayAccess::class,
+            $container
+        );
+        self::assertSame(
+            __DIR__ . '/templates',
+            $v4 ? $container->get('renderer')->getOption('path') : $container['templates.path']
+        );
     }
 
     public function testAttributes()

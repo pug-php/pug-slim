@@ -6,6 +6,7 @@ use ArrayAccess;
 use DI\Container;
 use Psr\Http\Message\ResponseInterface;
 use Pug\Pug;
+use RuntimeException;
 use Slim\App;
 use Slim\Psr7\Factory\ResponseFactory;
 
@@ -57,9 +58,7 @@ class PugRenderer
     public static function create(?App $app = null, $templatePath = null, array $options = [], array $attributes = [])
     {
         if (!$app) {
-            $app = defined(App::class . '::VERSION') && ((int) App::VERSION) >= 4
-                ? new App(new ResponseFactory())
-                : new App();
+            $app = self::createApp();
         }
 
         $container = $app->getContainer();
@@ -269,5 +268,21 @@ class PugRenderer
         // @codeCoverageIgnoreEnd
 
         return $this->adapter->renderFile($template, $data);
+    }
+
+    private static function createApp(): App
+    {
+        if (!defined(App::class . '::VERSION') || ((int) App::VERSION) < 4) {
+            return new App();
+        }
+
+        if (!class_exists(ResponseFactory::class)) {
+            throw new RuntimeException(
+                'You need to install or update slim/psr7 to create an instance of ' . self::class .
+                ' without passing an app context'
+            );
+        }
+
+        return new App(new ResponseFactory());
     }
 }
