@@ -7,6 +7,7 @@ use DI\Container;
 use Psr\Http\Message\ResponseInterface;
 use Pug\Pug;
 use Slim\App;
+use Slim\Psr7\Factory\ResponseFactory;
 
 /**
  * Class PugRenderer.
@@ -56,7 +57,9 @@ class PugRenderer
     public static function create(?App $app = null, $templatePath = null, array $options = [], array $attributes = [])
     {
         if (!$app) {
-            $app = new App();
+            $app = defined(App::class . '::VERSION') && ((int) App::VERSION) >= 4
+                ? new App(new ResponseFactory())
+                : new App();
         }
 
         $container = $app->getContainer();
