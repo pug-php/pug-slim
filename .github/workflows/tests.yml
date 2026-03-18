@@ -37,6 +37,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ matrix.setup }}-php-${{ matrix.php }}-
 
+    - name: Add fig/http-message-util
+      if: matrix.setup == 'lowest' && matrix.php == '7.1'
+      run: |
+        composer require "fig/http-message-util:^1.1.5" --no-update
+
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: |
