@@ -15,6 +15,7 @@ use Slim\Http\Stream as Slim3Stream;
 use Slim\Http\Uri as Slim3Uri;
 use Slim\Psr7\Headers;
 use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 use Slim\Psr7\Stream;
 use Slim\Psr7\Uri;
 use Slim\Pug\PugRenderer;
@@ -116,7 +117,7 @@ abstract class AbstractTestCase extends TestCase
         // Slim 4
         if (class_exists(Headers::class)) {
             // Run App & Emit Response
-            $response = $app->handle(new Request(
+            $response = $this->getResponse($app, new Request(
                 'GET',
                 new Uri('https', 'domain.com', 443, $path),
                 new Headers(),
@@ -163,5 +164,19 @@ abstract class AbstractTestCase extends TestCase
         }
 
         return $contents;
+    }
+
+    private function getResponse(App $app, Request $request): Response
+    {
+        if (!method_exists($app, 'handle')) {
+            error_reporting(E_ALL ^ E_DEPRECATED);
+            $response = new Response();
+            $app->process($request, $response);
+
+            return $response;
+        }
+
+        // Run App & Emit Response
+        return $app->handle($request);
     }
 }
